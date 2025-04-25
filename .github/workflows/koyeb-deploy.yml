@@ -12,9 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Koyeb
-        uses: koyeb/action@v2
+      - name: Install and configure the Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
         with:
-          service: ${{ secrets.KOYEB_SERVICE }}
-          token: ${{ secrets.KOYEB_TOKEN }}
-          app: ${{ secrets.KOYEB_APP }}
+          api_token: "${{ secrets.KOYEB_TOKEN }}"
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Deploy to Koyeb
+        run: koyeb service redeploy ltd-freddi/head-podcast-server
