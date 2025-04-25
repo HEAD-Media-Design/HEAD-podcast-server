@@ -19,16 +19,29 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images", "files", "videos"]
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
     },
-    "email": {
+    "instagram": {
       "type": "string"
     },
-    "articles": {
+    "podcasts": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::article.article",
+      "target": "api::podcast.podcast",
       "mappedBy": "author"
+    },
+    "email": {
+      "type": "email"
+    },
+    "website": {
+      "type": "string"
+    },
+    "school_start": {
+      "type": "date"
     }
   }
 }
