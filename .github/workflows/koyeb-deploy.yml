@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy to Koyeb
-        uses: koyeb/action@v1
+        uses: koyeb/action@v2
         with:
           service: ${{ secrets.KOYEB_SERVICE }}
           token: ${{ secrets.KOYEB_TOKEN }}
