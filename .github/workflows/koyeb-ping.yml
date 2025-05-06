@@ -1,0 +1,13 @@
+name: Keep Koyeb App Awake
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # ping every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Koyeb Strapi App
+        run: curl -s "${{ secrets.PING_ENDPOINT }}" > /dev/null
