@@ -19,7 +19,12 @@ export default [
       },
     },
   },
-  "strapi::cors",
+  {
+    name: "strapi::cors",
+    config: {
+      headers: ["Content-Type", "Authorization", "Cache-Control"], // Add 'Cache-Control' to the allowed headers
+    },
+  },
   "strapi::poweredBy",
   "strapi::query",
   "strapi::body",
