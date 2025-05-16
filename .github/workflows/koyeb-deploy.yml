@@ -18,4 +18,4 @@ jobs:
           api_token: "${{ secrets.KOYEB_TOKEN }}"
           github_token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Deploy to Koyeb
-        run: koyeb service redeploy ltd-freddi/head-podcast-server
+        run: koyeb service redeploy medical-petra/head-podcast-server
