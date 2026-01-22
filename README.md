@@ -40,6 +40,59 @@ Strapi gives you many possible deployment options for your project including [St
 yarn strapi deploy
 ```
 
+## 🔥 Strapi Cloud Warmup (Cold Start Mitigation)
+
+This project includes a GitHub Actions workflow to mitigate cold start issues on Strapi Cloud (Free tier) by periodically warming up the instance.
+
+### How It Works
+
+- **Health Endpoint**: A lightweight `/api/health` endpoint is implemented that returns `{ "status": "ok" }` without any database queries
+- **Automated Warmup**: GitHub Actions runs every 10 minutes to call the health endpoint
+- **Public Endpoint**: The health endpoint is public (no authentication required) for simplicity and security
+
+### Setup Instructions
+
+1. **Set Repository Variable**:
+   - Go to your GitHub repository
+   - Navigate to: **Settings** > **Secrets and variables** > **Actions** > **Variables** tab
+   - Click **New repository variable**
+   - Name: `STRAPI_WARMUP_URL`
+   - Value: Your Strapi Cloud URL (e.g., `https://your-project.strapi.app`)
+   - Click **Add variable**
+
+2. **Verify Health Endpoint**:
+   - After deploying, test the health endpoint:
+   ```bash
+   curl https://your-project.strapi.app/api/health
+   ```
+   - Expected response: `{"status":"ok"}`
+
+3. **Test the Workflow**:
+   - Go to **Actions** tab in your GitHub repository
+   - Select **Strapi Warmup** workflow
+   - Click **Run workflow** to manually trigger it
+   - Check the logs to verify it's working correctly
+
+### Workflow Details
+
+- **Schedule**: Runs every 10 minutes (cron: `*/10 * * * *`)
+- **Manual Trigger**: Available via `workflow_dispatch` in the Actions tab
+- **Timeout**: 20 seconds per request
+- **User-Agent**: `GitHub-Actions-Strapi-Warmup/1.0` (for identifying warmup traffic)
+
+### Security Note
+
+The `/api/health` endpoint is intentionally public (no authentication) because:
+- It only returns a simple status response
+- It performs no database queries or sensitive operations
+- It's designed to be lightweight and fast
+- Public access simplifies the warmup process
+
+If your security policy requires authentication, you can:
+1. Modify `src/index.ts` to remove `auth: false` from the health endpoint
+2. Uncomment the token-based authentication sections in `.github/workflows/strapi-warmup.yml`
+3. Add `STRAPI_API_TOKEN` as a GitHub Secret (Settings > Secrets and variables > Actions > Secrets)
+
 ## 📚 Learn more
 
 - [Resource center](https://strapi.io/resource-center) - Strapi resource center.

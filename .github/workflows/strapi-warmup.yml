@@ -1,0 +1,66 @@
+name: Strapi Warmup
+
+on:
+  # Schedule: Run every 10 minutes
+  schedule:
+    - cron: '*/10 * * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  warmup:
+    name: Warmup Strapi Instance
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    
+    steps:
+      - name: Warmup Strapi API
+        run: |
+          # Get the Strapi warmup URL from repository variables
+          STRAPI_URL="${{ vars.STRAPI_WARMUP_URL }}"
+          
+          if [ -z "$STRAPI_URL" ]; then
+            echo "❌ Error: STRAPI_WARMUP_URL repository variable is not set"
+            echo "Please set it in: Settings > Secrets and variables > Actions > Variables"
+            exit 1
+          fi
+          
+          # Optional: Get API token if authentication is required
+          # Uncomment the following lines if you need token-based authentication
+          # STRAPI_TOKEN="${{ secrets.STRAPI_API_TOKEN }}"
+          # if [ -z "$STRAPI_TOKEN" ]; then
+          #   echo "⚠️  Warning: STRAPI_API_TOKEN secret is not set, using public endpoint"
+          # fi
+          
+          echo "🔥 Warming up Strapi instance: $STRAPI_URL"
+          
+          # Build curl command with timeout and User-Agent header
+          CURL_ARGS=(
+            -s
+            -w "\nHTTP Status: %{http_code}\nTotal Time: %{time_total}s\n"
+            --max-time 20
+            --connect-timeout 10
+            -H "User-Agent: GitHub-Actions-Strapi-Warmup/1.0"
+            -H "Accept: application/json"
+          )
+          
+          # Add Authorization header if token is provided
+          # Uncomment if using token-based authentication
+          # if [ -n "$STRAPI_TOKEN" ]; then
+          #   CURL_ARGS+=(-H "Authorization: Bearer $STRAPI_TOKEN")
+          # fi
+          
+          # Execute the warmup request
+          RESPONSE=$(curl "${CURL_ARGS[@]}" "${STRAPI_URL}/api/health" 2>&1 || true)
+          
+          echo "$RESPONSE"
+          
+          # Check if the request was successful (HTTP 200)
+          HTTP_CODE=$(echo "$RESPONSE" | grep "HTTP Status:" | awk '{print $3}' || echo "")
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Warmup successful - Strapi instance is ready"
+          else
+            echo "⚠️  Warmup completed with HTTP $HTTP_CODE"
+            echo "This is expected during cold starts. The instance should be ready for the next request."
+          fi

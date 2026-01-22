@@ -1,4 +1,4 @@
-// import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
 
 export default {
   /**
@@ -7,7 +7,24 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // Register custom health check endpoint
+    strapi.server.routes([
+      {
+        method: 'GET',
+        path: '/api/health',
+        handler: async (ctx) => {
+          // Lightweight health check endpoint without DB queries
+          // Returns 200 OK with simple JSON response
+          ctx.body = { status: 'ok' };
+          ctx.status = 200;
+        },
+        config: {
+          auth: false, // Public endpoint, no authentication required
+        },
+      },
+    ]);
+  },
 
   /**
    * An asynchronous bootstrap function that runs before
